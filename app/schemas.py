@@ -5,11 +5,13 @@ CREATE TABLE IF NOT EXISTS problems (
     statement TEXT NOT NULL,
     difficulty TEXT NOT NULL,
     tags TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    source_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE CASCADE
     );
 """
 
-SOLTIONS_TABLE_SCHEMA =  """
+SOLUTIONS_TABLE_SCHEMA =  """
         CREATE TABLE IF NOT EXISTS solutions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     problem_id INTEGER NOT NULL,
@@ -18,8 +20,10 @@ SOLTIONS_TABLE_SCHEMA =  """
                     language TEXT NOT NULL,
                     intuition TEXT NOT NULL,
                     performance_notes TEXT, 
-                       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                       FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
+                    source_id INTEGER,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE,
+                    FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE CASCADE
                     )"""
 
 ATTEMPTS_TABLE_SCHEMA = """
@@ -44,3 +48,13 @@ FEEDBACK_TABLE_SCHEMA = """
                        FOREIGN KEY (attempt_id) REFERENCES attempts(id) ON DELETE CASCADE,
                        FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
                        )"""
+
+SOURCES_TABLE_SCHEMA = """
+        CREATE TABLE IF NOT EXISTS sources (
+                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       name TEXT NOT NULL UNIQUE,
+                       type TEXT,
+                       url TEXT,
+                       note TEXT
+                       )
+"""

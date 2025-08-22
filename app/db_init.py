@@ -1,4 +1,5 @@
 import sqlite3
+from .schemas import PROBLEMS_TABLE_SCHEMA, SOLUTIONS_TABLE_SCHEMA, ATTEMPTS_TABLE_SCHEMA, FEEDBACK_TABLE_SCHEMA, SOURCES_TABLE_SCHEMA
 
 DB_PATH = "db/study_budy.db"
 
@@ -14,54 +15,9 @@ def db_init():
         # Cursor Object to help execute sql queries 
         cursor = dbConnection.cursor()
         print("DB Init")
-        # Create the problems table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS problems (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT NOT NULL,
-                    statement TEXT NOT NULL,
-                    difficulty TEXT NOT NULL,
-                    tags TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )""")
-        # Create the solutions table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS solutions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    problem_id INTEGER NOT NULL,
-                    solution_type TEXT NOT NULL,
-                    solution_content TEXT NOT NULL,
-                    language TEXT NOT NULL,
-                    intuition TEXT NOT NULL,
-                    performance_notes TEXT, 
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
-                    )""")
-
-        # Create the attempts table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS attempts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    problem_id INTEGER NOT NULL,
-                    attempt_type TEXT NOT NULL,
-                    attempt_content TEXT NOT NULL,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
-                       )""")
-
-        # Create the feedback table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS feedback (
-                       id INTEGER PRIMARY KEY AUTOINCREMENT,
-                       attempt_id INTEGER NOT NULL,
-                       problem_id INTEGER NOT NULL,
-                       correctness TEXT NOT NULL,
-                       clarirty TEXT NOT NULL,
-                       feedback_content TEXT NOT NULL,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       FOREIGN KEY (attempt_id) REFERENCES attempts(id) ON DELETE CASCADE,
-                       FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
-                       )""")
+        # create tables if they do not exist
+        for schema in [PROBLEMS_TABLE_SCHEMA, SOLUTIONS_TABLE_SCHEMA, ATTEMPTS_TABLE_SCHEMA, FEEDBACK_TABLE_SCHEMA, SOURCES_TABLE_SCHEMA]:
+            cursor.execute(schema)
         
         dbConnection.commit()
         print("Database initialized successfully.")
@@ -86,4 +42,28 @@ def seed_sample_data():
     #                ("Sample Problem", "This is a sample problem statement.", "Easy", "sample,example"))
     # dbConnection.commit()
     # dbConnection.close()
-    pass
+    # This function can be expanded to include more sample data as needed.
+    LEETCODE_PROBLEMS = [
+        ("Climbing Stairs", "You are climbing a staircase. It takes n steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?", "Easy", "dynamic programming, recursion", "LeetCode"),
+        ("Two Sum", "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.", "Easy", "array, hash table", "LeetCode"),
+        ("Unique Paths", "A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below). The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below). How many possible unique paths are there?", "Medium", "dynamic programming, combinatorics", "LeetCode"),
+        ("Longest Substring Without Repeating Characters", "Given a string s, find the length of the longest substring without repeating characters.", "Medium", "hash table, sliding window", "LeetCode"),
+        ("Merge Intervals", "Given a collection of intervals, merge all overlapping intervals. For example, given intervals [1,3],[2,6],[8,10],[15,18], return [1,6],[8,10],[15,18].", "Medium", "array, sorting", "LeetCode"),
+        ("Course Schedule", "There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]. Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?", "Medium", "graph, topological sort", "LeetCode"),
+        ("Alien Dictionary", "Given a list of words from the alien language, find the order of characters in the alien language. The input is a list of words sorted lexicographically by the rules of the alien language.", "Hard", "graph, topological sort", "LeetCode"),
+    ]
+
+    QUANT_PROBLEMS = [
+        ("Chapter 1 Problem 15", "A stock with spot price $40 pays dividends continuously at a rate of 3%. The 4 months at-the-money put and call options on this asset are trading at $2 and $4 respectively. The risk free rate is constant and equal to 5%. Show that the Put-Call parity is not satisfied and explain how would you take advantage of this arbitrage opportunity", "Hard", "arbitrage, options pricing", "A Primer on Quantitative Finance"),
+        ("Question 7", "Suppose you have in your possession an incredibly large bag of M&Ms containing a uniform distribution of the six M&M colors. You decide to play a game: you draw one M&M from the bag and place it on the table. You then continue to draw M&M's from the bag one at a time. If you draw an M&M that is the same color as one already on the table, you eat both of them. Other wise, you place the M&M on the table along with the others of different color. The game ends when you have six M&M's on the table. How many M&M's should you expect to eat playing this game? ", "Hard", "probability, expectation, first-step-analysis, markov-chains", "150 Most Common Quantitative Finance Interview Questions"),
+        ("Face-to-face Question", "Roll two dice. What is the probability that one is larger than the other?", "probability-basic, axioms-of-prob", "Quantitative Primer"),
+        ("Phone Interview", "You are presented with the following gamble: you flip 100 fair coins. If 60 or more land on heads, you win £10; you win nothing on all other outcomes. Should you play this game for £1?", "conditinoal-prob, probability, expectation", "Quantitative Primer"),
+        ("Stick Breaking Problem", "Break a 1m stick in two random places. What is the probability that the three resulting pieces orm a triangle?", "conditional-prob, probability", "Quantitative Primer")
+    ]
+
+    SOURCES = [
+        ("LeetCode", "SWE", "https://leetcode.com", None),
+        ("Green Book", "Quant", None, "Quant interview Prep Book"),
+       ("Harvard 110 Text Book", "Quant", None, "Intro to Probability"),
+       ("Green Book", "Quant", None, "Intro to Probability"), 
+    ]
